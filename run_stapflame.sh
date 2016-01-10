@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # run_stapflame.sh, a script to generate flamegraphs of CPU and Oracle states
-# Frits Hoogland, jan 10 20016
+# Frits Hoogland, jan 10 2016
 #
 # Important:
 # This script needs two scripts from Brendan Gregg (https://github.com/brendangregg/FlameGraph):
