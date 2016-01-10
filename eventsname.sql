@@ -5,6 +5,7 @@
 -- 
 -- L.C. Aug 2014
 --
+-- Borrowed by Frits Hoogland for stapflames (jan 10, 2016)
 
 set echo off pages 0 lines 200 feed off head off sqlblanklines off trimspool on trimout on
 

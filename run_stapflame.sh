@@ -1,4 +1,22 @@
 #!/bin/bash
+#
+# run_stapflame.sh, a script to generate flamegraphs of CPU and Oracle states
+# Frits Hoogland, jan 10 20016
+#
+# Important:
+# This script needs two scripts from Brendan Gregg (https://github.com/brendangregg/FlameGraph):
+# stackcollapse-perf.pl
+# flamegraph.pl
+# Both perl scripts need to exist and be executable in the same directory as run_stapflame.sh.
+# 
+# And a script from Luca Canali (https://github.com/LucaCanali/Stack_Profiling):
+# eventsname.sql
+# The eventsname.sql script needs to be executed to generate the eventsname.sed file in the same directory as run_stapflame.sh.
+#
+# run_stapflame.sh needs a PID of an Oracle database foreground process already running as the first argument.
+#
+# This is EXPERIMENTAL software, use at your own risk!
+
 PROFILE_PID=$1
 
 stap -x $PROFILE_PID cpu-wait-profile.stap -o profile.txt &
