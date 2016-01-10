@@ -1,0 +1,118 @@
+global event_counter=10000, event_time=0, prev_local_clock, wait_nr, on_cpu_count=0
+global tot_cpu_time=0, cpu_time=0
+global tot_off_cpu=0, off_cpu=0
+
+global queue_time=0, queue_time_tot=0
+global ti_time=0, ti_time_tot=0
+global tu_time=0, tu_time_tot=0
+
+probe begin {
+        printf("Begin.\n")
+}
+
+probe scheduler.cpu_on {
+        if ( pid() == target() ) {
+		cpu_time = local_clock_us()	
+		if ( off_cpu > 0 ) tot_off_cpu+=local_clock_us()-off_cpu
+		off_cpu=0
+		on_cpu_count++
+        }
+}
+
+probe scheduler.cpu_off {
+        if ( pid() == target() )  {
+		tot_cpu_time+=local_clock_us()-cpu_time
+		cpu_time=0
+		off_cpu=local_clock_us()
+        }
+}
+
+probe scheduler.ctxswitch {
+	if ( prev_pid == target() && prevtsk_state == 0 ) 
+		queue_time=local_clock_us()
+	if ( next_pid == target() && nexttsk_state == 0 ) {
+		queue_time_tot+=local_clock_us()-queue_time
+		queue_time=0
+	}
+        if ( prev_pid == target() && prevtsk_state == 1 ) 
+                ti_time=local_clock_us()
+        if ( prev_pid == target() && prevtsk_state == 2 ) 
+                tu_time=local_clock_us()
+}
+
+probe scheduler.wakeup {
+	if ( task_pid == target() )
+		queue_time=local_clock_us()
+                if ( ti_time > 0 ) {
+                        ti_time_tot+=local_clock_us()-ti_time
+                        ti_time=0
+                }
+                if ( tu_time > 0 ) {
+                        tu_time_tot+=local_clock_us()-tu_time
+                        tu_time=0
+                }
+}
+
+
+probe process("/u01/app/oracle/product/12.1.0.2/dbhome_1/bin/oracle").function("kskthbwt") {
+        if ( pid() == target() ) {
+                wait_nr=register("rdx")
+		if ( event_time > 0 ) {
+			event_counter++
+			tot_cpu_time+=local_clock_us()-cpu_time
+                        //printf("c %5d    \ttot:%12d\ton:%12d\toff:%12d\tq:%12d\tti:%12d\ttu:%12d\t#slices:%5d\tc:%d\n",event_counter, local_clock_us()-event_time, tot_cpu_time, tot_off_cpu, queue_time_tot, ti_time_tot, tu_time_tot, on_cpu_count, local_clock_us())
+                        printf("%d;c;na;%d;%d;%d;%d;%d;%d;%d;%d;%d\n",event_counter, local_clock_us()-event_time, tot_cpu_time, tot_off_cpu, queue_time_tot, ti_time_tot, tu_time_tot, on_cpu_count, prev_local_clock, local_clock_us())
+			prev_local_clock=local_clock_us()
+			event_time=local_clock_us()
+			queue_time=0
+			cpu_time = local_clock_us()	
+			tot_cpu_time=0
+			queue_time_tot=0
+			tot_off_cpu=0
+			ti_time_tot=0
+			tu_time_tot=0
+			on_cpu_count=0
+		} else {
+			cpu_time = local_clock_us()	
+			prev_local_clock=local_clock_us()
+			tot_cpu_time=0
+			tot_off_cpu=0
+			queue_time_tot=0
+                        ti_time_tot=0
+                        tu_time_tot=0
+			on_cpu_count=0
+		}
+        }
+}
+probe process("/u01/app/oracle/product/12.1.0.2/dbhome_1/bin/oracle").function("kskthewt") {
+        if ( pid() == target() ) {
+		if ( event_time > 0 ) {
+			event_counter++
+			tot_cpu_time+=local_clock_us()-cpu_time
+                        //printf("w %5d %3d\ttot:%12d\ton:%12d\toff:%12d\tq:%12d\tti:%12d\ttu:%12d\t#slices:%5d\tc:%d\n",event_counter, wait_nr,local_clock_us()-event_time, tot_cpu_time, tot_off_cpu, queue_time_tot,ti_time_tot,tu_time_tot, on_cpu_count, local_clock_us())
+                        printf("%d;w;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n",event_counter, wait_nr, local_clock_us()-event_time, tot_cpu_time, tot_off_cpu, queue_time_tot, ti_time_tot, tu_time_tot, on_cpu_count, prev_local_clock, local_clock_us())
+			prev_local_clock=local_clock_us()
+			queue_time=0
+			event_time=local_clock_us()
+			cpu_time = local_clock_us()	
+			tot_cpu_time=0
+			queue_time_tot=0
+			tot_off_cpu=0
+                        ti_time_tot=0
+                        tu_time_tot=0
+                        on_cpu_count=0
+		} else {
+                	//wait_nr=register("rsi")
+			//printf("w     - %3d (no begin)\n",wait_nr)
+			prev_local_clock=local_clock_us()
+			event_time=local_clock_us()
+			tot_cpu_time=0
+			cpu_time = local_clock_us()	
+			tot_off_cpu=0
+			queue_time_tot=0
+                        ti_time_tot=0
+                        tu_time_tot=0
+			on_cpu_count=0
+		}
+        }
+}
