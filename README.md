@@ -18,7 +18,7 @@ For systemtap to understand the linux scheduler, the kernel debuginfo packages n
 The output of eventsname.sql (eventsname.sed) needs to be in the same directory as the run_stapflame.sh script. Also, the stackcollapse-perf.pl and flamegraph.pl scripts need to be in that directory too.
 
 To run it, execute, as root:
-# ./run_stapflame.sh 123
+./run_stapflame.sh 123
 (where 123 is the pid of an Oracle foreground process)
 The systemtap kernel module is compiled, and once systemtap and perf are setup, it will display:
 
