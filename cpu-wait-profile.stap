@@ -41,7 +41,7 @@ probe scheduler.ctxswitch {
 }
 
 probe scheduler.wakeup {
-	if ( task_pid == target() )
+	if ( task_pid == target() ) {
 		queue_time=local_clock_us()
                 if ( ti_time > 0 ) {
                         ti_time_tot+=local_clock_us()-ti_time
@@ -51,6 +51,7 @@ probe scheduler.wakeup {
                         tu_time_tot+=local_clock_us()-tu_time
                         tu_time=0
                 }
+	}
 }
 
 
