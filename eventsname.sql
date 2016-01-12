@@ -11,7 +11,7 @@ set echo off pages 0 lines 200 feed off head off sqlblanklines off trimspool on 
 
 spool eventsname.sed
 
-select 's/\<event#='||to_char(event#)||'\>/'||'event='||replace(name,'/','\/')||'/g' SED from v$event_name order by event# desc;
+select 's/^\([0-9]*;w;\)'||to_char(event#)||'/\1'||replace(name,'/','\/')||'/g' SED from v$event_name order by event# desc;
 
 spool off
 exit
