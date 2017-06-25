@@ -3,7 +3,7 @@ stapflame - a process stack profiling tool using systemtap, perf and flamegraphs
 Author: frits.hoogland@gmail.com
 Created: Januari 2016
 
-The purpose of this tool is to investigate where time is spend when running an Oracle database foreground process. 
+The purpose of this tool is to investigate where time is spent when running an Oracle database foreground process. 
 This tool uses perf to sample full stacktraces, and systemtap to profile the time.
 
 It uses two files from Brendan Gregg's flamegraph visualisation scripts (https://github.com/brendangregg/FlameGraph):
